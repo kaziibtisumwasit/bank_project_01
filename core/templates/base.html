@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% block head_title %}
+    <title>Bank Project</title>
+    {% endblock %}
+
+    <link href="https://unpkg.com/tailwindcss@2.0.1/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-indigo-600 min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    {% include 'navbar.html' %}
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block body %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    {% include 'footer.html' %}
+
+</body>
+
+</html>
