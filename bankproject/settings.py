@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -92,6 +93,8 @@ WSGI_APPLICATION = "bankproject.wsgi.application"
 #Here is the configuration for PostgreSQL database. Make sure to replace the placeholders with your actual database credentials.
 
 import environ
+import os
+import dj_database_url
 
 env = environ.Env(
     DEBUG=(bool, False)
@@ -100,15 +103,25 @@ env = environ.Env(
 environ.Env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY = env("SECRET_KEY")
+
+# Local Database
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": env("DB_NAME"),  ## .env theke access kortesi
+#         "USER": env("DB_USER"),
+#         "PASSWORD": env("DB_PASSWORD", default=""),
+#         "HOST": env("DB_HOST", default="127.0.0.1"),
+#         "PORT": env("DB_PORT", default="5432"),
+#     }
+# }
+
+## For On render Database
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("DB_NAME"),  ## .env theke access kortesi
-        "USER": env("DB_USER"),
-        "PASSWORD": env("DB_PASSWORD", default=""),
-        "HOST": env("DB_HOST", default="127.0.0.1"),
-        "PORT": env("DB_PORT", default="5432"),
-    }
+    'default': dj_database_url.config(
+        default='postgresql://bank_management_project_01_user:kyfpbHPtCL1DMy4j3gPdjDGpwit0WCRG@dpg-d9kh86h42hec73dpot2g-a.oregon-postgres.render.com/bank_management_project_01',
+        
+    )
 }
 
 # Password validation
