@@ -31,6 +31,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://bank-project-01.onrender.com",
+]
 
 # Application definition
 
