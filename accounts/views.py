@@ -5,6 +5,8 @@ from .forms import UserRegistrationForm ,UserUpdateForm
 from django.urls import reverse_lazy
 from django.contrib.auth import login,logout
 from django.views import View
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib.auth.mixins import LoginRequiredMixin
 # Create your views here.
 ##Class based View
 ##For form --> formview
@@ -69,3 +71,10 @@ class UserProfileUpdate(View):
     #     context = super().get_context_data(**kwargs)
     #     context['title'] = self.title
     #     return context
+    
+    
+    
+    
+class ChangePassword(LoginRequiredMixin,PasswordChangeView):
+    template_name = 'accounts/change_password.html'
+    success_url = reverse_lazy('profile_update')

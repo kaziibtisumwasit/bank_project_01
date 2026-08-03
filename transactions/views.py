@@ -20,11 +20,14 @@ from django.core.mail import EmailMessage,EmailMultiAlternatives
 from django.template.loader import render_to_string ## String theke template render korar jonno oi HTML template ta email e send korbo
 
   
-def transaction_email(user,email_subject,amount,balance,template_name):
+def transaction_email(user,email_subject,amount,balance,template_name,sender=None,receiver=None): ## transaction_email function create korlam , user,email_subject,amount,balance,template_name pass korlam
     message = render_to_string(template_name,{
         'user' : user, ## current user
         'amount' : amount,
         'balance' : balance,
+        'sender' : sender,
+        'receiver' : receiver,
+        
     })## Html template ke string akare render korlam , dictionary te user,amount,balance er value ta pathalam
     to_email = user.email
     send_email = EmailMultiAlternatives(email_subject,'',to=[to_email])
@@ -274,7 +277,7 @@ class TransferMoneyView(LoginRequiredMixin, FormView):
         try:
             receiver = UserBankAccount.objects.get(
                 account_no=receiver_account_number
-            )
+            ) ## USerBankAccount model theke receiver account number ke get korlam
 
         except UserBankAccount.DoesNotExist:
             messages.error(
@@ -323,7 +326,16 @@ class TransferMoneyView(LoginRequiredMixin, FormView):
             self.request,
             f"${amount} transferred successfully."
         )
-        
+        transaction_email(user=sender.user,
+                          email_subject="Money Transfer Confirmation",
+                          amount=amount,balance=sender.balance,
+                          template_name='transactions/money_transfer_sender_confirmation_email.html',
+                          sender=sender,receiver=receiver)  ## me
+        transaction_email(user=receiver.user,
+                          email_subject="Money Received Confirmation",
+                          amount=amount,balance=receiver.balance,
+                          template_name='transactions/money_received_confirmation_email.html',
+                          sender=sender,receiver=receiver)  ## another user  
         return super().form_valid(form)
     
     

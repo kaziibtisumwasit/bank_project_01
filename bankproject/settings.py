@@ -175,12 +175,22 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # For Sending Emails
 import os
 
-if os.environ.get("RENDER"):
+# Use console backend on Render because free Render instances
+# cannot send emails through Gmail SMTP (port 587 blocked).
+if os.environ.get("RENDER") == "True":
+
+    # Prints email content in Render logs instead of sending it
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
 else:
+    # Use Gmail SMTP for local development and testing
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+    # Gmail SMTP configuration
     EMAIL_HOST = "smtp.gmail.com"
-    EMAIL_USE_TLS = True
     EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+
+    # Load credentials from .env file
     EMAIL_HOST_USER = env("EMAIL")
     EMAIL_HOST_PASSWORD = env("EMAIL_PASSWORD")
