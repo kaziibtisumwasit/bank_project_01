@@ -7,6 +7,19 @@ from django.contrib.auth import login,logout
 from django.views import View
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.mail import EmailMessage,EmailMultiAlternatives
+from django.template.loader import render_to_string
+
+def profile_update_email(user,email_subject,email_template_name):
+    message = render_to_string(email_template_name,{
+        'user' : user,
+        'email_subject' : email_subject,
+        
+    })
+    to_email = user.email
+    send_email = EmailMultiAlternatives(email_subject,'',to=[to_email])
+    send_email.attach_alternative(message,'text/html')
+    send_email.send()
 # Create your views here.
 ##Class based View
 ##For form --> formview
@@ -75,6 +88,24 @@ class UserProfileUpdate(View):
     
     
     
-class ChangePassword(LoginRequiredMixin,PasswordChangeView):
-    template_name = 'accounts/change_password.html'
-    success_url = reverse_lazy('profile_update')
+class ChangePassword(LoginRequiredMixin, PasswordChangeView):
+    template_name = "accounts/change_password.html"
+    success_url = reverse_lazy("profile_update")
+
+    def form_valid(self, form):
+        # django buildin logic use kore password change korbe & session update korbe
+        response = super().form_valid(form)
+
+        try:
+            # Password change successful hole user ke email pathabe
+            profile_update_email(
+                self.request.user,
+                "Password Changed Successfully",
+                "accounts/change_password_email.html",
+            )
+        except Exception:
+            # email pathate problem hole email pathano skip korbe, but password change hobe
+            pass
+
+        # user ke success url e redirect korbe
+        return response
